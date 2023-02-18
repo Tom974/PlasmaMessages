@@ -1,0 +1,3 @@
+name: Plasmamessages
+version: '${project.version}'
+main: me.mynqme.plasmamessages.Plasmamessages
