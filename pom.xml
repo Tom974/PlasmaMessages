@@ -73,8 +73,9 @@
         <dependency>
             <groupId>me.clip.autosell</groupId>
             <artifactId>AutoSellAPI</artifactId>
-            <version>1.9.3</version>
-            <scope>provided</scope>
+            <version>1.8.6</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/AutoSell-1.8.6.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.luckperms</groupId>
