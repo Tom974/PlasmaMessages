@@ -39,7 +39,6 @@ public final class PlasmaMessages extends JavaPlugin
             }
         }
         Objects.requireNonNull(this.getServer().getPluginCommand("plasmamessages")).setExecutor(new Commands());
-        Objects.requireNonNull(this.getServer().getPluginCommand("givepick")).setExecutor(new Commands());
         Objects.requireNonNull(this.getServer().getPluginCommand("boosters")).setExecutor(new Commands());
     }
     

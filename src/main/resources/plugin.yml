@@ -1,3 +1,18 @@
-name: Plasmamessages
-version: '${project.version}'
-main: me.mynqme.plasmamessages.Plasmamessages
+name: PlasmaMessages
+version: '1.0'
+main: me.mynqme.plasmamessages.PlasmaMessages
+depend: [PlaceholderAPI]
+commands:
+  plasmamessages:
+    description: The main command for the plugin!
+    usage: /plasmamessages <arg0> <arg1> <arg2>
+    aliases: [pmsg]
+    permission: plasmamessages.use
+    permission-message: You don't have the permission to use this command!
+    tab-completer: dev.tom974.plasmamessages.commands.TabCompleter
+  boosters:
+    description: Shows your current active boosters!
+    usage: /boosters
+    aliases: [ boost, booster, b ]
+    permission: plasmamessages.boosters
+    permission-message: You don't have the permission to use this command!

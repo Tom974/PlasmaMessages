@@ -1,22 +1,13 @@
 package me.mynqme.plasmamessages;
 
-import org.bukkit.inventory.meta.ItemMeta;
-import java.util.Iterator;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.LuckPerms;
-import me.clip.autosell.objects.Multiplier;
-import java.util.HashMap;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.command.ConsoleCommandSender;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Objects;
 import org.bukkit.Bukkit;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.Material;
 import org.bukkit.ChatColor;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.LuckPermsProvider;
-import me.clip.autosell.AutoSellAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -32,26 +23,13 @@ public class Commands implements CommandExecutor
         }
         if ((command.getName().equalsIgnoreCase("booster") || command.getName().equalsIgnoreCase("boosters")) && sender instanceof Player) {
             final Player player = (Player)sender;
-            final Multiplier multiplier = AutoSellAPI.getMultiplier(player);
-            String sellbooster = "";
-            if (multiplier == null) {
-                sellbooster = " &f&l\u27a5 &c&lSell Booster: &f1.0x";
-            }
-            else {
-                sellbooster = " &f&l\u27a5 &c&lSell Booster: &f" + multiplier.getMultiplier() + "x";
-            }
             double tokenbooster = 1.0;
+            double tokenbooster2 = 0.0;
             double pickaxebooster = 1.0;
             final LuckPerms api = LuckPermsProvider.get();
-            final User user = api.getPlayerAdapter((Class)Player.class).getUser((Object)player);
+            final User user = api.getPlayerAdapter((Class)Player.class).getUser(player);
             for (final Node node : user.getNodes()) {
-                if (node.getKey().startsWith("plasmaprison.tokens.multiplier.")) {
-                    final float val = Integer.valueOf(node.getKey().split("plasmaprison.tokens.multiplier.")[1]);
-                    if (val > tokenbooster) {
-                        tokenbooster = val;
-                    }
-                }
-                if (node.getKey().startsWith("plasmaprison.tokens.multiplier.")) {
+                if (node.getKey().startsWith("leveltools.multiplier.")) {
                     final float val = Integer.valueOf(node.getKey().split("leveltools.multiplier.")[1]);
                     if (val <= pickaxebooster) {
                         continue;
@@ -60,27 +38,11 @@ public class Commands implements CommandExecutor
                 }
             }
             final String pickaxestring = "\n &l\u27a5 &a&lPickaxe Booster: &f" + pickaxebooster + "x";
-            final String tokenstring = "\n &l\u27a5 &6&lToken Booster: &f" + tokenbooster + "x";
+            final String sellbooster = " &f&l\u27a5 &c&lSell Booster: &f" + PlaceholderAPI.setPlaceholders(player, "%autosell_perm_multiplier%") + "x";
+            final String tokenstring = "\n &l\u27a5 &6&lToken Booster: &f" + PlaceholderAPI.setPlaceholders(player, "%plasmaprison_tokenmultiplier%") + "x";
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lPlasma&f&lMC &8» &r&dYour current active boosters:\n" + sellbooster + tokenstring + pickaxestring));
             return true;
-        }
-        if (command.getName().equalsIgnoreCase("givepick")) {
-            final ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE, 1);
-            final ItemMeta meta = item.getItemMeta();
-            assert meta != null;
-            if (args.length >= 1) {
-                meta.setDisplayName("§d" + Objects.requireNonNull(Bukkit.getPlayer(args[0])).getName() + "'s Pickaxe");
-            }
-            else {
-                meta.setDisplayName("§d" + sender.getName() + "'s Pickaxe");
-            }
-            meta.setUnbreakable(true);
-            meta.setLore((List)Arrays.asList(" ", "§5Enchantments"));
-            item.setItemMeta(meta);
-            ((Player)sender).getInventory().addItem(new ItemStack[] { item });
-            return true;
-        }
-        else {
+        } else {
             if (args.length < 3) {
                 sender.sendMessage("Usage: /plasmamessages <togglesetting,sendmessage> <type> <player>");
                 return true;

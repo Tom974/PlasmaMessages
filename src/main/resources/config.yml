@@ -1,0 +1,15 @@
+debug: false
+database:
+  host: 172.18.0.1
+  name: db_name
+  user: user
+  password: 'pass'
+cell_adaptions:
+  blacklistedWorlds:
+    - CellWorld
+  blacklistedBlocks:
+    - SPONGE
+    - BEACON
+    - SEA_LANTERN
+    - DRAGON_EGG
+  blacklistedBlockMessage: 'You cant place this block in a cell! Please use /value instead.'
