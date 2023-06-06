@@ -13,3 +13,7 @@ cell_adaptions:
     - SEA_LANTERN
     - DRAGON_EGG
   blacklistedBlockMessage: 'You cant place this block in a cell! Please use /value instead.'
+messages:
+  expansion: # Example
+    message: '&8[&d&lP-Mine&8] &fYour mine has expanded by %args% block!'
+    setting: '&8[&4&lSettings&8] &fYou have %args%&f Expansion messages.'

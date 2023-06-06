@@ -20,19 +20,10 @@ public class TabCompleter implements org.bukkit.command.TabCompleter
                 return list;
             }
             if (args.length == 1) {
-                list.add("expansion");
-                list.add("pickaxe");
-                list.add("minelevel");
-                list.add("prestige");
-                list.add("lucky");
-                list.add("treasurehunt");
-                list.add("keyfinder");
-                list.add("valuehunter");
-                list.add("lottery");
-                list.add("multifinder");
-                list.add("jackpot");
-                list.add("gemseeker");
-                list.add("safe");
+                for (String a : Config.MessageTypes.keySet()) {
+                    list.add(a);
+                }
+
                 for (final String s : list) {
                     if (!s.toLowerCase().startsWith(args[0].toLowerCase())) {
                         list.remove(s);

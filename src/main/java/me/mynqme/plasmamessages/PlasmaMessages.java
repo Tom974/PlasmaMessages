@@ -1,10 +1,7 @@
 package me.mynqme.plasmamessages;
 
 import org.bukkit.ChatColor;
-import java.util.Iterator;
-import org.bukkit.command.CommandExecutor;
 import java.util.Objects;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import java.sql.SQLException;
 import org.bukkit.plugin.Plugin;
@@ -16,7 +13,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class PlasmaMessages extends JavaPlugin
 {
     public static HashMap<UUID, HashMap<String, String>> playerData;
-    
+    public static PlasmaMessages getInstance() {
+        return PlasmaMessages.getPlugin(PlasmaMessages.class);
+    }
     public void onEnable() {
         this.getLogger().info("PlasmaMessages has been enabled!");
         Files.base();
@@ -39,7 +38,6 @@ public final class PlasmaMessages extends JavaPlugin
             }
         }
         Objects.requireNonNull(this.getServer().getPluginCommand("plasmamessages")).setExecutor(new Commands());
-        Objects.requireNonNull(this.getServer().getPluginCommand("boosters")).setExecutor(new Commands());
     }
     
     public static void playerMessage(final Player player, final String msg) {

@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 import java.sql.Statement;
 import org.bukkit.ChatColor;
@@ -36,7 +37,9 @@ public class Database
             console("&7 \u2022&c Failed to connect to the MySQL database.");
             e2.printStackTrace();
         }
-        console("&7 \u2022&f Connected to the MySQL database.");
+        if (Config.debug) {
+            console("&7 \u2022&f Connected to the MySQL database.");
+        }
         return connection;
     }
     
@@ -53,30 +56,18 @@ public class Database
     
     public static void createPlayer(final UUID uuid) throws SQLException {
         Connection conn = getConnection();
-        final PreparedStatement statement = conn.prepareStatement("SELECT * FROM `s6_prison_server`.`plasmamessages` WHERE uuid = ?");
-        statement.setString(1, uuid.toString());
-        final ResultSet results = statement.executeQuery();
-        if (!results.next()) {
-            final HashMap<String, String> temp2 = new HashMap<String, String>();
-            temp2.put("expansion", "true");
-            temp2.put("pickaxe", "true");
-            temp2.put("minelevel", "true");
-            temp2.put("prestige", "true");
-            temp2.put("lucky", "true");
-            temp2.put("treasurehunt", "true");
-            temp2.put("keyfinder", "true");
-            temp2.put("valuehunter", "true");
-            temp2.put("lottery", "true");
-            temp2.put("multifinder", "true");
-            temp2.put("jackpot", "true");
-            temp2.put("gemseeker", "true");
-            temp2.put("safe", "true");
-            for (final String key : temp2.keySet()) {
-                final PreparedStatement insert = conn.prepareStatement("INSERT INTO `s6_prison_server`.`plasmamessages` (`uuid`, `setting`, `value`) VALUES (?, ?, ?)");
-                insert.setString(1, uuid.toString());
-                insert.setString(2, key);
-                insert.setString(3, temp2.get(key));
-                insert.executeUpdate();
+        ResultSet rs = null;
+        for (String key : Config.MessageTypes.keySet()) {
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM `plasmamessages` WHERE `setting` = ? AND `uuid` = ?");
+            stmt.setString(1, key);
+            stmt.setString(2, uuid.toString());
+            rs = stmt.executeQuery();
+            if (!rs.next()) {
+                stmt = conn.prepareStatement("INSERT INTO `plasmamessages` (`uuid`, `setting`, `value`) VALUES (?, ?, ?)");
+                stmt.setString(1, uuid.toString());
+                stmt.setString(2, key);
+                stmt.setString(3, "true");
+                stmt.executeUpdate();
             }
         }
         conn.close();
@@ -84,10 +75,13 @@ public class Database
     
     public static void saveToDatabase(final UUID uuid) throws SQLException {
         Connection conn = getConnection();
-        for (final String key : PlasmaMessages.playerData.get(uuid).keySet()) {
-            final PreparedStatement statement = conn.prepareStatement("UPDATE `s6_prison_server`.`plasmamessages` SET `value` = ? WHERE uuid = ? AND setting = ?");
+        for (String key : PlasmaMessages.playerData.get(uuid).keySet()) {
+            PreparedStatement statement = conn.prepareStatement("UPDATE `plasmamessages` SET `value` = ? WHERE uuid = ? AND setting = ?");
             statement.setString(1, PlasmaMessages.playerData.get(uuid).get(key));
             statement.setString(2, uuid.toString());
+            if (key == "" || key == null || key.equals(" ")) {
+                key = "true";
+            }
             statement.setString(3, key);
             statement.executeUpdate();
         }
@@ -96,7 +90,7 @@ public class Database
     
     public static HashMap<UUID, HashMap<String, String>> getAllPlayerData() throws SQLException {
         Connection conn = getConnection();
-        final PreparedStatement statement = conn.prepareStatement("SELECT * FROM `s6_prison_server`.`plasmamessages` ORDER BY `id` DESC");
+        final PreparedStatement statement = conn.prepareStatement("SELECT * FROM `plasmamessages` ORDER BY `id` DESC");
         final ResultSet results = statement.executeQuery();
         final HashMap<UUID, HashMap<String, String>> tempmap = new HashMap<UUID, HashMap<String, String>>();
         if (results.next()) {
@@ -117,27 +111,13 @@ public class Database
     
     public static HashMap<String, String> getPlayerData(final UUID uuid) throws SQLException {
         Connection conn = getConnection();
-        final PreparedStatement statement = conn.prepareStatement("SELECT * FROM `s6_prison_server`.`plasmamessages` WHERE `uuid` = ? ORDER BY `id` DESC");
+        final PreparedStatement statement = conn.prepareStatement("SELECT * FROM `plasmamessages` WHERE `uuid` = ? ORDER BY `id` DESC");
         statement.setString(1, uuid.toString());
         final ResultSet results = statement.executeQuery();
         final HashMap<String, String> tempmap = new HashMap<String, String>();
         if (!results.next()) {
             createPlayer(uuid);
-            final HashMap<String, String> temp2 = new HashMap<String, String>();
-            temp2.put("expansion", "true");
-            temp2.put("pickaxe", "true");
-            temp2.put("minelevel", "true");
-            temp2.put("prestige", "true");
-            temp2.put("lucky", "true");
-            temp2.put("treasurehunt", "true");
-            temp2.put("keyfinder", "true");
-            temp2.put("valuehunter", "true");
-            temp2.put("lottery", "true");
-            temp2.put("multifinder", "true");
-            temp2.put("jackpot", "true");
-            temp2.put("gemseeker", "true");
-            temp2.put("safe", "true");
-            return temp2;
+            return Config.MessageTypes;
         }
         do {
             final String setting = results.getString("setting");

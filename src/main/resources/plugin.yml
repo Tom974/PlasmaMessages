@@ -10,9 +10,3 @@ commands:
     permission: plasmamessages.use
     permission-message: You don't have the permission to use this command!
     tab-completer: dev.tom974.plasmamessages.commands.TabCompleter
-  boosters:
-    description: Shows your current active boosters!
-    usage: /boosters
-    aliases: [ boost, booster, b ]
-    permission: plasmamessages.boosters
-    permission-message: You don't have the permission to use this command!

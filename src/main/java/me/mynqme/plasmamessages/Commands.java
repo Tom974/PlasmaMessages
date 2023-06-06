@@ -1,376 +1,126 @@
 package me.mynqme.plasmamessages;
 
-import net.luckperms.api.model.user.User;
-import net.luckperms.api.LuckPerms;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import net.luckperms.api.node.Node;
-import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.entity.Player;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.CommandExecutor;
+import java.sql.SQLException;
+import java.util.Arrays;
 
 public class Commands implements CommandExecutor
 {
     public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
-        if (args.length == 1 && command.getName().equalsIgnoreCase("plasmamessages") && args[0].equalsIgnoreCase("reload")) {
+        if (!command.getName().equalsIgnoreCase("plasmamessages")) {
+            return true;
+        }
+        if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
             Config.reload();
             PlasmaMessages.playerMessage((Player)sender, "§aConfig reloaded!");
             return true;
         }
-        if ((command.getName().equalsIgnoreCase("booster") || command.getName().equalsIgnoreCase("boosters")) && sender instanceof Player) {
-            final Player player = (Player)sender;
-            double tokenbooster = 1.0;
-            double tokenbooster2 = 0.0;
-            double pickaxebooster = 1.0;
-            final LuckPerms api = LuckPermsProvider.get();
-            final User user = api.getPlayerAdapter((Class)Player.class).getUser(player);
-            for (final Node node : user.getNodes()) {
-                if (node.getKey().startsWith("leveltools.multiplier.")) {
-                    final float val = Integer.valueOf(node.getKey().split("leveltools.multiplier.")[1]);
-                    if (val <= pickaxebooster) {
-                        continue;
-                    }
-                    pickaxebooster = val;
-                }
-            }
-            final String pickaxestring = "\n &l\u27a5 &a&lPickaxe Booster: &f" + pickaxebooster + "x";
-            final String sellbooster = " &f&l\u27a5 &c&lSell Booster: &f" + PlaceholderAPI.setPlaceholders(player, "%autosell_perm_multiplier%") + "x";
-            final String tokenstring = "\n &l\u27a5 &6&lToken Booster: &f" + PlaceholderAPI.setPlaceholders(player, "%plasmaprison_tokenmultiplier%") + "x";
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5&lPlasma&f&lMC &8» &r&dYour current active boosters:\n" + sellbooster + tokenstring + pickaxestring));
-            return true;
-        } else {
-            if (args.length < 3) {
-                sender.sendMessage("Usage: /plasmamessages <togglesetting,sendmessage> <type> <player>");
-                return true;
-            }
-            final String arg0 = args[0].toLowerCase();
-            final String arg2 = args[1].toLowerCase();
-            final Player player2 = Bukkit.getPlayer(args[2]);
-            assert player2 != null;
-            if (sender instanceof ConsoleCommandSender || (sender instanceof Player && sender.hasPermission("*"))) {
-                if (arg0.equals("togglesetting")) {
-                    final String s = arg2;
-                    switch (s) {
-                        case "expansion": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("expansion").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("expansion", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f Expansion messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("expansion", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f Expansion messages.");
-                            break;
-                        }
-                        case "pickaxe": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("pickaxe").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("pickaxe", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f Pickaxe Levelup messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("pickaxe", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f Pickaxe Levelup messages.");
-                            break;
-                        }
-                        case "minelevel": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("minelevel").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("minelevel", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f Minelevel Levelup messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("minelevel", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f Minelevel Levelup messages.");
-                            break;
-                        }
-                        case "prestige": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("prestige").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("prestige", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f Prestige messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("prestige", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f Prestige messages.");
-                            break;
-                        }
-                        case "lucky": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("lucky").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("lucky", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f Lucky messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("lucky", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f Lucky messages.");
-                            break;
-                        }
-                        case "treasurehunt": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("treasurehunt").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("treasurehunt", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f TreasureHunt messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("treasurehunt", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f TreasureHunt messages.");
-                            break;
-                        }
-                        case "keyfinder": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("keyfinder").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("keyfinder", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f KeyFinder messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("keyfinder", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f KeyFinder messages.");
-                            break;
-                        }
-                        case "valuehunter": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("valuehunter").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("valuehunter", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f ValueHunter messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("valuehunter", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f ValueHunter messages.");
-                            break;
-                        }
-                        case "lottery": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("lottery").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("lottery", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f Lottery messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("lottery", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f Lottery messages.");
-                            break;
-                        }
-                        case "multifinder": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("multifinder").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("multifinder", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f MultiFinder messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("multifinder", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f MultiFinder messages.");
-                            break;
-                        }
-                        case "jackpot": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("jackpot").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("jackpot", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f JackPot messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("jackpot", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f JackPot messages.");
-                            break;
-                        }
-                        case "gemseeker": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("gemseeker").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("gemseeker", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f GemSeeker messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("gemseeker", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f GemSeeker messages.");
-                            break;
-                        }
-                        case "safe": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("safe").equals("true")) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put("safe", "false");
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f Safe messages.");
-                                break;
-                            }
-                            PlasmaMessages.playerData.get(player2.getUniqueId()).put("safe", "true");
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &aenabled&f Safe messages.");
-                            break;
-                        }
-                        case "all": {
-                            for (final String key : PlasmaMessages.playerData.get(player2.getUniqueId()).keySet()) {
-                                PlasmaMessages.playerData.get(player2.getUniqueId()).put(key, "false");
-                            }
-                            PlasmaMessages.playerMessage(player2, "&8[&4&lSettings&8] &fYou have &cdisabled&f all enchant messages.");
-                            break;
-                        }
-                    }
-                    return true;
-                }
-                StringBuilder extraargs = new StringBuilder();
-                for (int i = 3; i < args.length; ++i) {
-                    extraargs.append(args[i]).append(" ");
-                    if (i == args.length - 1) {
-                        extraargs = new StringBuilder(extraargs.substring(0, extraargs.length() - 1));
-                    }
-                }
-                if (arg0.equals("sendmessage")) {
-                    final String s2 = arg2;
-                    switch (s2) {
-                        case "safe": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("safe").equals("true")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&3&lSafe&8] &fYou won " + (Object)extraargs + " from the safe!");
-                                break;
-                            }
-                            break;
-                        }
-                        case "expansion": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("expansion").equals("true")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&d&lP-Mine&8] &fYour mine has expanded by 1 block!");
-                                break;
-                            }
-                            break;
-                        }
-                        case "pickaxe": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("pickaxe").equals("true")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&b&lPickaxe&8] &fYour pickaxe leveled up to level &3" + args[3]);
-                                break;
-                            }
-                            break;
-                        }
-                        case "minelevel": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("minelevel").equals("true")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&a&lMine&8] &fYour mine leveled up to level &2" + args[3]);
-                                break;
-                            }
-                            break;
-                        }
-                        case "prestige": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("prestige").equals("true")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&a&lPrestige&8] &fYou have prestiged");
-                                break;
-                            }
-                            break;
-                        }
-                        case "gemseeker": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("gemseeker").equals("true")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&a&lGem Seeker&8] &fYou found &2" + (Object)extraargs + " &aGems&f.");
-                                break;
-                            }
-                            break;
-                        }
-                        case "jackpot": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("jackpot").equals("true")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lJ&6&la&e&lc&a&lk&b&lp&9&lo&5&lt&8] &fYou found a &4Reward&f.");
-                                break;
-                            }
-                            break;
-                        }
-                        case "multifinder": {
-                            if (args.length < 4) {
-                                PlasmaMessages.playerMessage(player2, "Usage: /plasmamessages sendmessage multifinder <player> <type>");
-                                return true;
-                            }
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("multifinder").equals("false")) {
-                                return true;
-                            }
-                            final String typeMulti = args[3].toLowerCase();
-                            if (typeMulti.equals("sellmulti15min")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&c&lMultiFinder&8] &fYou found a &41.25x Sell Multiplier &ffor &415min&f.");
-                                break;
-                            }
-                            if (typeMulti.equals("tokenmulti15min")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&c&lMultiFinder&8] &fYou found a &41.25x Token Multiplier &ffor &415min&f.");
-                                break;
-                            }
-                            if (typeMulti.equals("xpmulti15min")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&c&lMultiFinder&8] &fYou found a &41.25x XP Multiplier &ffor &415min&f.");
-                                break;
-                            }
-                            if (typeMulti.equals("1sellmulti15min")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&c&lMultiFinder&8] &fYou found a &41.5x Sell Multiplier &ffor &415min&f.");
-                                break;
-                            }
-                            if (typeMulti.equals("1tokenmulti15min")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&c&lMultiFinder&8] &fYou found a &41.5x Token Multiplier &ffor &415min&f.");
-                                break;
-                            }
-                            if (typeMulti.equals("1xpmulti15min")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&c&lMultiFinder&8] &fYou found a &41.5x XP Multiplier &ffor &415min&f.");
-                                break;
-                            }
-                            PlasmaMessages.playerMessage(player2, "&8[&5&lPlasma&f&lMessages&8] &cAn error has occured. Please create a ticket using this message.");
-                            break;
-                        }
-                        case "lottery": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("lottery").equals("true")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&6&lLottery&8] &fYou found a &eLottery Ticket&f.");
-                                break;
-                            }
-                            break;
-                        }
-                        case "valuehunter": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("valuehunter").equals("false")) {
-                                return true;
-                            }
-                            final String typeValue = args[3].toLowerCase();
-                            if (typeValue.equals("sponge")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&5&lValue Hunter&8] &fYou received &e" + args[4] + "x Sponge&f.");
-                                break;
-                            }
-                            if (typeValue.equals("beacon")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&5&lValue Hunter&8] &fYou received &b" + args[4] + "x&f Beacon&f.");
-                                break;
-                            }
-                            if (typeValue.equals("dragonegg")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&5&lValue Hunter&8] &fYou received &5" + args[4] + "x&f Dragon egg&f.");
-                                break;
-                            }
-                            if (typeValue.equals("sealantern")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&5&lValue Hunter&8] &fYou received &3" + args[4] + "x&f Sea Lantern&f.");
-                                break;
-                            }
-                            PlasmaMessages.playerMessage(player2, "&8[&5&lPlasma&f&lMessages&8] &cAn error has occured. Please create a ticket using this message.");
-                            break;
-                        }
-                        case "keyfinder": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("keyfinder").equals("false")) {
-                                return true;
-                            }
-                            final String typeKeyFinder = args[3].toLowerCase();
-                            if (typeKeyFinder.equals("mine1")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lKeyFinder&8] &fYou received a &bMine Key&7 (Tier 1)");
-                                break;
-                            }
-                            if (typeKeyFinder.equals("mine2")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lKeyFinder&8] &fYou received a &bMine Key&7 (Tier 2)");
-                                break;
-                            }
-                            if (typeKeyFinder.equals("mine3")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lKeyFinder&8] &fYou received a &bMine Key&7 (Tier 3)");
-                                break;
-                            }
-                            if (typeKeyFinder.equals("affix")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lKeyFinder&8] &fYou received a &eAffix Key");
-                                break;
-                            }
-                            if (typeKeyFinder.equals("lithium")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lKeyFinder&8] &fYou received a &4Lithium Key");
-                                break;
-                            }
-                            if (typeKeyFinder.equals("plasma")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&4&lKeyFinder&8] &fYou received a &5Plasma Key");
-                                break;
-                            }
-                            break;
-                        }
-                        case "treasurehunt": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("treasurehunt").equals("true")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&9&lTreasure Hunt&8] &fYou found a &6" + (Object)extraargs + " Treasure");
-                                break;
-                            }
-                            break;
-                        }
-                        case "lucky": {
-                            if (PlasmaMessages.playerData.get(player2.getUniqueId()).get("lucky").equals("true")) {
-                                PlasmaMessages.playerMessage(player2, "&8[&3&lLucky&8] &fYou received &e" + (Object)extraargs);
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                    return true;
-                }
-            }
+        if (args.length < 3) {
+            sender.sendMessage("Usage: /plasmamessages <togglesetting,sendmessage, custommessage> <type> <player>");
             return true;
         }
+        final String arg0 = args[0].toLowerCase();
+        final String arg2 = args[1].toLowerCase();
+        final Player player2 = Bukkit.getPlayer(args[2]);
+        assert player2 != null;
+        if (sender instanceof ConsoleCommandSender || (sender instanceof Player && sender.hasPermission("*"))) {
+            if (arg0.equalsIgnoreCase("custommessage")) {
+                // get everything after the first 2 args and put it in 1 long string
+                Player plyer = Bukkit.getPlayer(args[1]);
+                if (plyer == null) {
+                    sender.sendMessage("You didn't specify an online player!");
+                }
+                String msg = Arrays.toString(args)
+                        .replace("[", "")
+                        .replace("]", "")
+                        .replace(",", "")
+                        .replace(args[0], "")
+                        .replace(args[1], "")
+                .trim();
+                PlasmaMessages.playerMessage(plyer, msg);
+                return true;
+            }
+            if (arg0.equals("togglesetting")) {
+                final String string = arg2;
+                if (!PlasmaMessages.playerData.containsKey(player2.getUniqueId())) {
+                    try {
+                        Database.createPlayer(player2.getUniqueId());
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    try {
+                        PlasmaMessages.playerData.put(player2.getUniqueId(), Database.getPlayerData(player2.getUniqueId()));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                if (!PlasmaMessages.playerData.containsKey(player2.getUniqueId())) {
+                    Bukkit.getLogger().warning("Something went wrong, playerData does not contain user: " + player2.getUniqueId());
+                    return true;
+                }
+                if (!PlasmaMessages.playerData.get(player2.getUniqueId()).containsKey(string)) {
+                    Bukkit.getLogger().warning("Something went wrong, playerData does not contain string: " + string + " for player: " + player2.getName());
+                    for (final String s : PlasmaMessages.playerData.get(player2.getUniqueId()).keySet()) {
+                        Bukkit.getLogger().warning("Key set: " + s);
+                    }
+                    return true;
+                }
+                if (PlasmaMessages.playerData.get(player2.getUniqueId()).get(string) == null) {
+                    Bukkit.getLogger().warning("Something went wrong, playerData string is null: " + string + " for player: " + player2.getName() + " value: " + PlasmaMessages.playerData.get(player2.getUniqueId()).get(string));
+                    for (final String s : PlasmaMessages.playerData.get(player2.getUniqueId()).keySet()) {
+                        Bukkit.getLogger().warning("Key set: " + s);
+                    }
+                    return true;
+                }
+                if (PlasmaMessages.playerData.get(player2.getUniqueId()).get(string).equals("true")) {
+                    PlasmaMessages.playerData.get(player2.getUniqueId()).put(string, "false");
+                    PlasmaMessages.playerMessage(player2, Files.config.getString("messages." + string + ".setting").replace("%args%", "&cdisabled"));
+                } else {
+                    PlasmaMessages.playerData.get(player2.getUniqueId()).put(string, "true");
+                    PlasmaMessages.playerMessage(player2, Files.config.getString("messages." + string + ".setting").replace("%args%", "&aenabled"));
+                }
+                return true;
+            }
+
+            StringBuilder extraargs = new StringBuilder();
+            for (int i = 3; i < args.length; ++i) {
+                extraargs.append(args[i]).append(" ");
+                if (i == args.length - 1) {
+                    extraargs = new StringBuilder(extraargs.substring(0, extraargs.length() - 1));
+                }
+            }
+            if (arg0.equals("sendmessage")) {
+                if (!PlasmaMessages.playerData.containsKey(player2.getUniqueId())) {
+                    Bukkit.getLogger().warning("Something went wrong, playerData does not contain user: " + player2.getName());
+                    return true;
+                }
+                final String s2 = arg2;
+                if (Files.config.getString("messages." + s2 + ".message") == null) {
+                    Bukkit.getLogger().warning("&8[&4&lSettings&8] &cThe "+s2+" message doesn't exist in the config!");
+                    return true;
+                }
+                if (PlasmaMessages.playerData.get(player2.getUniqueId()).containsKey(s2)) {
+                    if (PlasmaMessages.playerData.get(player2.getUniqueId()).get(s2) == null) {
+                        Bukkit.getLogger().warning("Something went wrong, playerData does not contain string: " + s2 + " for player: " + player2.getName());
+                        return true;
+                    }
+                    if (PlasmaMessages.playerData.get(player2.getUniqueId()).get(s2).equals("true")) {
+                        PlasmaMessages.playerMessage(player2, Files.config.getString("messages." + s2 + ".message").replace("%args%", extraargs.toString()));
+                    }
+                }
+
+                return true;
+            }
+
+        }
+        return true;
+
     }
 }
